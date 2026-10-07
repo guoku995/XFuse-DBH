@@ -1,0 +1,12 @@
+# XFuse-DBH — exact versions used for the reported results (Python 3.12, CUDA 12.6).
+# Install PyTorch from the CUDA 12.6 index to reproduce:
+#   pip install torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu126
+numpy==1.26.4
+scipy==1.13.1
+opencv-python==4.11.0.86
+torch>=2.7.0
+torchvision>=0.22.0
+
+# Optional: enables memory-efficient attention in the DINOv2 backbone.
+# The code falls back to plain PyTorch attention when xformers is missing.
+# xformers
