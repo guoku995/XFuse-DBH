@@ -24,7 +24,7 @@ The fusion module is trained **without DBH labels and without trunk masks**, sup
 target-frame-excluded temporal reprojection, raw LiDAR anchors and consistency with the frozen
 dense prior.
 
-<img src="assets/xfuse_architecture.png" width="100%">
+<img src="xfuse_architecture.png" width="100%">
 
 ---
 
@@ -99,32 +99,6 @@ The exact versions used for the reported results are pinned in `requirements.txt
 PyTorch attention when it is unavailable. A CUDA GPU is required for training and for the full
 evaluation; CPU inference is possible but slow.
 
-## Data preparation
-
-The datasets (RGB–LiDAR recordings, trunk masks), the pretrained checkpoints and the trained
-weights are **not** distributed with this repository. The recordings were captured with a mobile
-platform carrying an RGB camera and a 64-beam LiDAR; reference DBH was measured with a flexible
-tape at breast height.
-
-Recreate the caches from your own recordings with the scripts in `tools/`:
-
-| Script | Produces | Needed by |
-|---|---|---|
-| `tools/build_temporal_lidar_cache.py` | target-frame-excluded temporal LiDAR supervision in camera coordinates (training cache) | `train_prior_lidar_direct_fusion.py` |
-| `tools/prepare_dense_lidar_cache.py` | DBH-independent dense-depth training inputs | data pipeline |
-| `tools/build_lidar_measurement_cache.py` | labelled evaluation cache (requires trunk masks) | `eval_prior_lidar_direct_fusion.py` |
-
-A cache sample stores:
-
-| Array | Type | Meaning |
-|---|---|---|
-| `img_bgr` | `uint8 [H,W,3]` | RGB frame |
-| `prior_m` | `float32 [H,W]` | projected single-frame LiDAR depth, metres |
-| `prior_valid` | `uint8 [H,W]` | validity mask of the projection |
-| `disp` | `float32 [H,W]` | frozen relative disparity from the dense MDE |
-| `mask` | `uint8 [H,W]` | target-trunk mask (evaluation cache only) |
-| `gt_m` | `float32 [H,W]` | sequence depth in metres (evaluation cache only) |
-| `gt_valid` | `uint8 [H,W]` | validity mask of the sequence depth |
 
 Two external checkpoints are required and must be placed where the scripts expect them:
 
@@ -197,18 +171,11 @@ and, for training-side ablations, `--no-cross-fusion`, `--no-evidence`,
 
 ## Scope of this repository
 
-This repository covers the **depth stage** of the measurement pipeline, XFuse-DBH. The
-language-guided localization stage (the RefTree referring-expression dataset, the GRPO-tuned
-Qwen2.5-VL prompt generator and the frozen SAM2 segmenter) is a separate component and is not
-included here. The mask it produces is an input to the evaluation cache; it never enters the
-depth network. Its accuracy nevertheless bounds the read-out region — on the RefTree test split,
-reward-aligned prompt generation raises gIoU from 49.6 % to 88.4 %, cIoU from 42.2 % to 88.8 %
-and Acc@0.5 from 54.5 % to 100.0 % over the untrained baseline:
+The language-guided localization stage (the RefTree referring-expression dataset, the GRPO-tuned
+Qwen2.5-VL prompt generator and the frozen SAM2 segmenter) is a separate component 
 
-<img src="assets/reftree_localization.png" width="70%">
+<img src="reftree_localization.png" width="70%">
 
-Not included for size reasons: the RGB–LiDAR recordings, the trunk masks, the pretrained
-checkpoints and the trained weights.
 
 
 ## Acknowledgements
